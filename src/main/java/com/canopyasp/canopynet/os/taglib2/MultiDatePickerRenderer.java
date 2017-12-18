@@ -1,4 +1,4 @@
-package com.jc776.eetest;
+package com.canopyasp.canopynet.os.taglib2;
 
 import java.io.IOException;
 import java.util.Date;
@@ -16,13 +16,15 @@ import org.primefaces.util.WidgetBuilder;
 
 @FacesRenderer(componentFamily = MultiDatePicker.COMPONENT_FAMILY, rendererType = MultiDatePickerRenderer.RENDERER_TYPE)
 public class MultiDatePickerRenderer extends CoreRenderer {
-  public static final String RENDERER_TYPE = "com.jc776.MultiDatePickerRenderer";
-  public static final String WIDGET_MULTIDATEPICKER = "MultiDatePicker";
-  public static final String TAG_DIV = "div";
-  public static final String ATTR_ID = "id";
+  public static final String RENDERER_TYPE = "com.canopyasp.canopynet.os.taglib2.MultiDatePickerRenderer"; //$NON-NLS-1$
+  public static final String WIDGET_MULTIDATEPICKER = "MultiDatePicker"; //$NON-NLS-1$
+  public static final String TAG_DIV = "div"; //$NON-NLS-1$
+  public static final String ATTR_ID = "id"; //$NON-NLS-1$
 
   @Override
   public void decode(final FacesContext context, final UIComponent component) {
+    final MultiDatePicker multiDatePicker = (MultiDatePicker) component;
+    this.decodeBehaviors(context, multiDatePicker);
     final String submittedValue = context.getExternalContext()
         .getRequestParameterMap().get(component.getClientId(context));
     // [10000000, 10000001]
@@ -32,7 +34,7 @@ public class MultiDatePickerRenderer extends CoreRenderer {
       final long time = (Long) obj;
       dates.add(new Date(time));
     });
-    ((MultiDatePicker) component).setSubmittedValue(dates);
+    multiDatePicker.setSubmittedValue(dates);
   }
 
   @Override
@@ -43,6 +45,7 @@ public class MultiDatePickerRenderer extends CoreRenderer {
     this.encodeScript(context, multiDatePicker);
   }
 
+  @SuppressWarnings("resource")
   protected void encodeMarkup(final FacesContext context,
       final MultiDatePicker multiDatePicker) throws IOException {
     final ResponseWriter writer = context.getResponseWriter();
@@ -75,6 +78,7 @@ public class MultiDatePickerRenderer extends CoreRenderer {
       wb.attr(MultiDatePicker.PropertyKeys.maxDate.name(),
           multiDatePicker.getMaxDate().getTime());
     }
+    this.encodeClientBehaviors(context, multiDatePicker);
     wb.finish();
   }
 }

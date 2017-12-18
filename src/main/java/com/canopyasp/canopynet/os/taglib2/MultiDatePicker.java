@@ -1,5 +1,8 @@
-package com.jc776.eetest;
+package com.canopyasp.canopynet.os.taglib2;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
@@ -8,6 +11,7 @@ import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UINamingContainer;
+import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.component.api.Widget;
@@ -20,18 +24,32 @@ import org.primefaces.component.api.Widget;
     @ResourceDependency(library = "primefaces", name = "jquery/jquery.js"),
     @ResourceDependency(library = "primefaces", name = "core.js"),
     @ResourceDependency(library = "primefaces", name = "components.js"),
-    @ResourceDependency(library = "jc776", name = "react.production.min.js"),
-    @ResourceDependency(library = "jc776", name = "react-dom.production.min.js"),
-    @ResourceDependency(library = "jc776", name = "react-daypicker.min.js"),
-    @ResourceDependency(library = "jc776", name = "react-daypicker.css"),
-    @ResourceDependency(library = "jc776", name = "MultipleDatePicker.js") })
-public class MultiDatePicker extends UIInput implements Widget {
+    @ResourceDependency(library = "date", name = "react.production.min.js"),
+    @ResourceDependency(library = "date", name = "react-dom.production.min.js"),
+    @ResourceDependency(library = "date", name = "react-daypicker.min.js"),
+    @ResourceDependency(library = "date", name = "react-daypicker.css"),
+    @ResourceDependency(library = "date", name = "MultipleDatePicker.js") })
+public class MultiDatePicker extends UIInput
+    implements Widget, ClientBehaviorHolder {
   protected static enum PropertyKeys {
     value, widgetVar, minDate, maxDate;
   }
 
-  public static final String COMPONENT_TYPE = "com.jc776.MultiDatePicker";
-  public static final String COMPONENT_FAMILY = "com.jc776.components";
+  private static final String EVENT_CHANGE = "change";
+  private static final Collection<String> EVENT_NAMES = Collections
+      .unmodifiableCollection(Arrays.asList(MultiDatePicker.EVENT_CHANGE));
+  public static final String COMPONENT_TYPE = "com.canopyasp.canopynet.os.taglib2.MultiDatePicker"; //$NON-NLS-1$
+  public static final String COMPONENT_FAMILY = "com.canopyasp.canopynet.os.taglib2.components"; //$NON-NLS-1$
+
+  @Override
+  public String getDefaultEventName() {
+    return MultiDatePicker.EVENT_CHANGE;
+  }
+
+  @Override
+  public Collection<String> getEventNames() {
+    return MultiDatePicker.EVENT_NAMES;
+  }
 
   @Override
   public String getFamily() {
@@ -64,8 +82,8 @@ public class MultiDatePicker extends UIInput implements Widget {
       return userWidgetVar;
     }
     final FacesContext context = this.getFacesContext();
-    return "widget_" + this.getClientId(context)
-        .replaceAll("-|" + UINamingContainer.getSeparatorChar(context), "_");
+    return "widget_" + this.getClientId(context) //$NON-NLS-1$
+        .replaceAll("-|" + UINamingContainer.getSeparatorChar(context), "_"); //$NON-NLS-1$//$NON-NLS-2$
   }
 
   public void setMaxDate(final Date maxDate) {

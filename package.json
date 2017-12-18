@@ -12,8 +12,8 @@
     "babel-preset-react": "^6.24.1"
   },
   "scripts": {
-    "watch": "babel MultipleDatePicker.jsx --presets=env,react --watch --out-file src/main/resources/META-INF/resources/jc776/MultipleDatePicker.js",
-    "once": "babel MultipleDatePicker.jsx --presets=env,react --out-file src/main/resources/META-INF/resources/jc776/MultipleDatePicker.js"
+    "watch": "babel MultipleDatePicker.jsx --presets=env,react --watch --out-file src/main/resources/META-INF/resources/date/MultipleDatePicker.js",
+    "once": "babel MultipleDatePicker.jsx --presets=env,react --out-file src/main/resources/META-INF/resources/date/MultipleDatePicker.js"
   },
   "author": "",
   "license": "ISC"

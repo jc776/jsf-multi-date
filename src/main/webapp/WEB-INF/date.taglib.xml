@@ -6,8 +6,8 @@
 	<tag>
 		<tag-name>multidate</tag-name>
 		<component>
-			<component-type>com.jc776.MultiDatePicker</component-type>
-			<renderer-type>com.jc776.MultiDatePickerRenderer</renderer-type>
+			<component-type>com.canopyasp.canopynet.os.taglib2.MultiDatePicker</component-type>
+			<renderer-type>com.canopyasp.canopynet.os.taglib2.MultiDatePickerRenderer</renderer-type>
 		</component>
 	</tag>
 </facelet-taglib>
