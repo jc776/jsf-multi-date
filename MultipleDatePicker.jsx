@@ -26,12 +26,10 @@ function toggleDays(dates, inputDates, props) {
 	)
 	console.log(missingDates)
 	if(missingDates.length == 0) {
-		console.log("deselect all the toggle dates")
 		return dates.filter(date => !toggleDates.some(
 			toggleDate => DayPicker.DateUtils.isSameDay(date, toggleDate)
 		))
 	} else {
-		console.log("select the new toggle dates")
 		return [...missingDates, ...dates]
 	}
 }
@@ -50,27 +48,24 @@ function getDaysOfMonth(dayInMonth) {
 class MultiDate extends React.Component {
 	constructor(props) {
 		super(props);
-		this.handleDayClick = this.handleDayClick.bind(this);
-		this.handleRowClick = this.handleRowClick.bind(this);
-		this.handleColumnClick = this.handleColumnClick.bind(this);
+		this.handleDayClick = this.handleDayClick.bind(this)
+		this.handleRowClick = this.handleRowClick.bind(this)
+		this.handleColumnClick = this.handleColumnClick.bind(this)
 		this.handleMonthChange = this.handleMonthChange.bind(this)
 		// state here vs state in PrimeFaces?
 		this.state = {
-			selectedDays: this.props.dates,
 			currentMonth: new Date()
 		}
 	}
 
 	handleMonthChange(date) {
-		const { selectedDays } = this.state;
 		this.setState({
 			currentMonth: date,
-			selectedDays
 		})
 	}
 
 	handleDayClick(day, { disabled, selected }) {
-		const { currentMonth, selectedDays } = this.state;
+		const selectedDays = this.props.dates;
 		if(disabled) {
 			return;
 		}
@@ -82,45 +77,33 @@ class MultiDate extends React.Component {
 		} else {
 		  selectedDays.push(day);
 		}
-		this.setState({ 
-			currentMonth,
-			selectedDays
-		});
+		this.props.onChange(selectedDays)
 	  }
 
 	handleRowClick(week, days) {
-		const { currentMonth, selectedDays } = this.state;
+		const selectedDays = this.props.dates;
 		console.log("row!", week, days)
-		this.setState({ 
-			currentMonth,
-			selectedDays: toggleDays(selectedDays, days, this.props)
-		});
+		this.props.onChange(toggleDays(selectedDays, days, this.props))
 	}
 
 	handleColumnClick(weekday) {
-		const { currentMonth, selectedDays } = this.state;
+		const { currentMonth } = this.state
+		const selectedDays = this.props.dates;
 		console.log("column!", currentMonth, weekday)
 		const days = getDaysOfMonth(currentMonth).filter(day => 
 			day.getDay() == weekday
 		)
-		this.setState({ 
-			currentMonth,
-			selectedDays: toggleDays(selectedDays, days, this.props)
-		});
+		this.props.onChange(toggleDays(selectedDays, days, this.props))
 	}
 
 	render() {
-		const { currentMonth, selectedDays } = this.state;
+		const selectedDays = this.props.dates;
 		const weekdayElement = <WeekdayClick onClick={this.handleColumnClick} />
-		const jsonDays = JSON.stringify(
-			selectedDays.map(day => day.getTime())
-		)
 		const disabledDays = (!this.props.debug && {
 			before: this.props.minDate,
 			after: this.props.maxDate
 		})
-		return <div>
-			<DayPicker 
+		return <DayPicker 
 				selectedDays={selectedDays}
 				onDayClick={this.handleDayClick}
 				onWeekClick={this.handleRowClick}
@@ -132,8 +115,44 @@ class MultiDate extends React.Component {
 				showOutsideDays
 				disabledDays={disabledDays}
 			/>
-			<input type="hidden" name={this.props.jsfId} value={jsonDays}/>
-		</div>
+			
+	}
+}
+
+class MultiDateJSF extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleChange = this.handleChange.bind(this)
+		const dates = this.props.cfg.value.map(epoch => new Date(epoch))
+		this.state = {
+			dates
+		}
+	}
+	
+	view() {
+		const {dates} = this.state;
+		const jsonDates = JSON.stringify(
+			dates.map(day => day.getTime())
+		)
+		return (<div>
+			<MultiDate 
+				dates={dates} 
+				onChange={this.handleChange}
+				minDate={new Date(this.props.cfg.minDate)} 
+				maxDate={new Date(this.props.cfg.maxDate)}
+				debug={this.props.cfg.debug} 
+			/>
+			<input type="hidden" name={this.props.cfg.id} value={jsonDates}/>
+		</div>)
+	}
+	
+	handleChange(dates) {
+		if(this.props.cfg.behaviors && this.props.cfg.behaviors.change) {
+            this.props.cfg.behaviors.change.call(this.input);
+        }
+		this.setState({
+			dates
+		})
 	}
 }
 
@@ -143,29 +162,18 @@ PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 		this._super(cfg)
 		this.render()
 	},
-
-	view: function() {
-		const dates = this.cfg.value.map(epoch => new Date(epoch))
-		return <MultiDate 
-			dates={dates} 
-			minDate={new Date(this.cfg.minDate)} 
-			maxDate={new Date(this.cfg.maxDate)}
-			debug={false} 
-			jsfId={this.cfg.id}
-		/>
-	},
 	
 	render: function() {
-		ReactDOM.render(this.view(), this.jq[0])
+		console.log("HELLO")
+		console.log(this.cfg)
+		ReactDOM.render(<MultiDateJSF cfg={this.cfg}/>, this.jq[0])
 	},
 
 	destroy: function() {
-		console.log("UNMOUNT")
+		console.log("MultiDate - UNMOUNT")
 	},
 
 	update: function() {
-		console.log("UPDATE")
-	},
-
-
+		console.log("MultiDate - UPDATE")
+	}
 })

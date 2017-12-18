@@ -48,14 +48,12 @@ function toggleDays(dates, inputDates, props) {
 	});
 	console.log(missingDates);
 	if (missingDates.length == 0) {
-		console.log("deselect all the toggle dates");
 		return dates.filter(function (date) {
 			return !toggleDates.some(function (toggleDate) {
 				return DayPicker.DateUtils.isSameDay(date, toggleDate);
 			});
 		});
 	} else {
-		console.log("select the new toggle dates");
 		return [].concat(_toConsumableArray(missingDates), _toConsumableArray(dates));
 	}
 }
@@ -85,7 +83,6 @@ var MultiDate = function (_React$Component) {
 		_this.handleMonthChange = _this.handleMonthChange.bind(_this);
 		// state here vs state in PrimeFaces?
 		_this.state = {
-			selectedDays: _this.props.dates,
 			currentMonth: new Date()
 		};
 		return _this;
@@ -94,11 +91,8 @@ var MultiDate = function (_React$Component) {
 	_createClass(MultiDate, [{
 		key: "handleMonthChange",
 		value: function handleMonthChange(date) {
-			var selectedDays = this.state.selectedDays;
-
 			this.setState({
-				currentMonth: date,
-				selectedDays: selectedDays
+				currentMonth: date
 			});
 		}
 	}, {
@@ -106,10 +100,8 @@ var MultiDate = function (_React$Component) {
 		value: function handleDayClick(day, _ref2) {
 			var disabled = _ref2.disabled,
 			    selected = _ref2.selected;
-			var _state = this.state,
-			    currentMonth = _state.currentMonth,
-			    selectedDays = _state.selectedDays;
 
+			var selectedDays = this.props.dates;
 			if (disabled) {
 				return;
 			}
@@ -121,76 +113,106 @@ var MultiDate = function (_React$Component) {
 			} else {
 				selectedDays.push(day);
 			}
-			this.setState({
-				currentMonth: currentMonth,
-				selectedDays: selectedDays
-			});
+			this.props.onChange(selectedDays);
 		}
 	}, {
 		key: "handleRowClick",
 		value: function handleRowClick(week, days) {
-			var _state2 = this.state,
-			    currentMonth = _state2.currentMonth,
-			    selectedDays = _state2.selectedDays;
-
+			var selectedDays = this.props.dates;
 			console.log("row!", week, days);
-			this.setState({
-				currentMonth: currentMonth,
-				selectedDays: toggleDays(selectedDays, days, this.props)
-			});
+			this.props.onChange(toggleDays(selectedDays, days, this.props));
 		}
 	}, {
 		key: "handleColumnClick",
 		value: function handleColumnClick(weekday) {
-			var _state3 = this.state,
-			    currentMonth = _state3.currentMonth,
-			    selectedDays = _state3.selectedDays;
+			var currentMonth = this.state.currentMonth;
 
+			var selectedDays = this.props.dates;
 			console.log("column!", currentMonth, weekday);
 			var days = getDaysOfMonth(currentMonth).filter(function (day) {
 				return day.getDay() == weekday;
 			});
-			this.setState({
-				currentMonth: currentMonth,
-				selectedDays: toggleDays(selectedDays, days, this.props)
-			});
+			this.props.onChange(toggleDays(selectedDays, days, this.props));
 		}
 	}, {
 		key: "render",
 		value: function render() {
-			var _state4 = this.state,
-			    currentMonth = _state4.currentMonth,
-			    selectedDays = _state4.selectedDays;
-
+			var selectedDays = this.props.dates;
 			var weekdayElement = React.createElement(WeekdayClick, { onClick: this.handleColumnClick });
-			var jsonDays = JSON.stringify(selectedDays.map(function (day) {
-				return day.getTime();
-			}));
 			var disabledDays = !this.props.debug && {
 				before: this.props.minDate,
 				after: this.props.maxDate
 			};
-			return React.createElement(
-				"div",
-				null,
-				React.createElement(DayPicker, {
-					selectedDays: selectedDays,
-					onDayClick: this.handleDayClick,
-					onWeekClick: this.handleRowClick,
-					onMonthChange: this.handleMonthChange,
-					weekdayElement: weekdayElement,
-					fromMonth: this.props.minDate,
-					toMonth: this.props.maxDate,
-					showWeekNumbers: true,
-					showOutsideDays: true,
-					disabledDays: disabledDays
-				}),
-				React.createElement("input", { type: "hidden", name: this.props.jsfId, value: jsonDays })
-			);
+			return React.createElement(DayPicker, {
+				selectedDays: selectedDays,
+				onDayClick: this.handleDayClick,
+				onWeekClick: this.handleRowClick,
+				onMonthChange: this.handleMonthChange,
+				weekdayElement: weekdayElement,
+				fromMonth: this.props.minDate,
+				toMonth: this.props.maxDate,
+				showWeekNumbers: true,
+				showOutsideDays: true,
+				disabledDays: disabledDays
+			});
 		}
 	}]);
 
 	return MultiDate;
+}(React.Component);
+
+var MultiDateJSF = function (_React$Component2) {
+	_inherits(MultiDateJSF, _React$Component2);
+
+	function MultiDateJSF(props) {
+		_classCallCheck(this, MultiDateJSF);
+
+		var _this2 = _possibleConstructorReturn(this, (MultiDateJSF.__proto__ || Object.getPrototypeOf(MultiDateJSF)).call(this, props));
+
+		_this2.handleChange = _this2.handleChange.bind(_this2);
+		var dates = _this2.props.cfg.value.map(function (epoch) {
+			return new Date(epoch);
+		});
+		_this2.state = {
+			dates: dates
+		};
+		return _this2;
+	}
+
+	_createClass(MultiDateJSF, [{
+		key: "view",
+		value: function view() {
+			var dates = this.state.dates;
+
+			var jsonDates = JSON.stringify(dates.map(function (day) {
+				return day.getTime();
+			}));
+			return React.createElement(
+				"div",
+				null,
+				React.createElement(MultiDate, {
+					dates: dates,
+					onChange: this.handleChange,
+					minDate: new Date(this.props.cfg.minDate),
+					maxDate: new Date(this.props.cfg.maxDate),
+					debug: this.props.cfg.debug
+				}),
+				React.createElement("input", { type: "hidden", name: this.props.cfg.id, value: jsonDates })
+			);
+		}
+	}, {
+		key: "handleChange",
+		value: function handleChange(dates) {
+			if (this.props.cfg.behaviors && this.props.cfg.behaviors.change) {
+				this.props.cfg.behaviors.change.call(this.input);
+			}
+			this.setState({
+				dates: dates
+			});
+		}
+	}]);
+
+	return MultiDateJSF;
 }(React.Component);
 
 PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
@@ -199,29 +221,17 @@ PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 		this.render();
 	},
 
-	view: function view() {
-		var dates = this.cfg.value.map(function (epoch) {
-			return new Date(epoch);
-		});
-		return React.createElement(MultiDate, {
-			dates: dates,
-			minDate: new Date(this.cfg.minDate),
-			maxDate: new Date(this.cfg.maxDate),
-			debug: false,
-			jsfId: this.cfg.id
-		});
-	},
-
 	render: function render() {
-		ReactDOM.render(this.view(), this.jq[0]);
+		console.log("HELLO");
+		console.log(this.cfg);
+		ReactDOM.render(React.createElement(MultiDateJSF, { cfg: this.cfg }), this.jq[0]);
 	},
 
 	destroy: function destroy() {
-		console.log("UNMOUNT");
+		console.log("MultiDate - UNMOUNT");
 	},
 
 	update: function update() {
-		console.log("UPDATE");
+		console.log("MultiDate - UPDATE");
 	}
-
 });
