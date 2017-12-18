@@ -204,7 +204,9 @@ var MultiDate = function (_React$PureComponent) {
 				showWeekNumbers: true,
 				showOutsideDays: true,
 				fixedWeeks: true,
-				disabledDays: disabledDays
+				disabledDays: disabledDays,
+				locale: "fr",
+				localeUtils: DayPicker.LocaleUtils
 			});
 		}
 	}]);

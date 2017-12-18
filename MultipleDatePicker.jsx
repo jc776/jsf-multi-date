@@ -142,6 +142,8 @@ class MultiDate extends React.PureComponent {
 			showOutsideDays
 			fixedWeeks
 			disabledDays={disabledDays}
+			locale="fr"
+			localeUtils={DayPicker.LocaleUtils} 
 		/>
 	}
 }
