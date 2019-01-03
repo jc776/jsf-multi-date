@@ -25,16 +25,18 @@ public class MultiDatePickerRenderer extends CoreRenderer {
   public void decode(final FacesContext context, final UIComponent component) {
     final MultiDatePicker multiDatePicker = (MultiDatePicker) component;
     this.decodeBehaviors(context, multiDatePicker);
-    final String submittedValue = context.getExternalContext()
-        .getRequestParameterMap().get(component.getClientId(context));
-    // [10000000, 10000001]
-    final JSONArray times = new JSONArray(submittedValue);
-    final Set<Date> dates = new TreeSet<>();
-    times.forEach(obj -> {
-      final long time = (Long) obj;
-      dates.add(new Date(time));
-    });
-    multiDatePicker.setSubmittedValue(dates);
+    final String submittedValue = context.getExternalContext().getRequestParameterMap()
+        .get(component.getClientId(context));
+    if (submittedValue != null) {
+      // [10000000, 10000001]
+      final JSONArray times = new JSONArray(submittedValue);
+      final Set<Date> dates = new TreeSet<>();
+      times.forEach(obj -> {
+        final long time = (Long) obj;
+        dates.add(new Date(time));
+      });
+      multiDatePicker.setSubmittedValue(dates);
+    }
   }
 
   @Override
@@ -46,38 +48,34 @@ public class MultiDatePickerRenderer extends CoreRenderer {
   }
 
   @SuppressWarnings("resource")
-  protected void encodeMarkup(final FacesContext context,
-      final MultiDatePicker multiDatePicker) throws IOException {
+  protected void encodeMarkup(final FacesContext context, final MultiDatePicker multiDatePicker)
+      throws IOException {
     final ResponseWriter writer = context.getResponseWriter();
     writer.startElement(MultiDatePickerRenderer.TAG_DIV, multiDatePicker);
-    writer.writeAttribute(MultiDatePickerRenderer.ATTR_ID,
-        multiDatePicker.getClientId(), null);
+    writer.writeAttribute(MultiDatePickerRenderer.ATTR_ID, multiDatePicker.getClientId(), null);
     writer.endElement(MultiDatePickerRenderer.TAG_DIV);
   }
 
-  protected void encodeScript(final FacesContext context,
-      final MultiDatePicker multiDatePicker) throws IOException {
+  protected void encodeScript(final FacesContext context, final MultiDatePicker multiDatePicker)
+      throws IOException {
     final String clientId = multiDatePicker.getClientId();
     final String widgetVar = multiDatePicker.resolveWidgetVar();
     final WidgetBuilder wb = this.getWidgetBuilder(context);
-    wb.initWithDomReady(MultiDatePickerRenderer.WIDGET_MULTIDATEPICKER,
-        widgetVar, clientId);
+    wb.initWithDomReady(MultiDatePickerRenderer.WIDGET_MULTIDATEPICKER, widgetVar, clientId);
     if (multiDatePicker.getValue() != null) {
       final JSONArray array = new JSONArray();
       for (final Date date : multiDatePicker.getValue()) {
         array.put(date.getTime());
       }
-      wb.nativeAttr(MultiDatePicker.PropertyKeys.value.name(),
-          array.toString());
+      wb.nativeAttr(MultiDatePicker.PropertyKeys.value.name(), array.toString());
     }
     if (multiDatePicker.getMinDate() != null) {
-      wb.attr(MultiDatePicker.PropertyKeys.minDate.name(),
-          multiDatePicker.getMinDate().getTime());
+      wb.attr(MultiDatePicker.PropertyKeys.minDate.name(), multiDatePicker.getMinDate().getTime());
     }
     if (multiDatePicker.getMaxDate() != null) {
-      wb.attr(MultiDatePicker.PropertyKeys.maxDate.name(),
-          multiDatePicker.getMaxDate().getTime());
+      wb.attr(MultiDatePicker.PropertyKeys.maxDate.name(), multiDatePicker.getMaxDate().getTime());
     }
+    wb.attr(MultiDatePicker.PropertyKeys.readOnly.name(), multiDatePicker.isReadOnly());
     this.encodeClientBehaviors(context, multiDatePicker);
     wb.finish();
   }

@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 
-import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
@@ -17,29 +16,26 @@ import javax.faces.context.FacesContext;
 import org.primefaces.component.api.Widget;
 
 @FacesComponent(value = MultiDatePicker.COMPONENT_TYPE)
-@ResourceDependencies({
-    // @ResourceDependency(library = "moment", name = "moment.min.js"),
-    // react
-    // react-dom
-    @ResourceDependency(library = "primefaces", name = "jquery/jquery.js"),
-    @ResourceDependency(library = "primefaces", name = "core.js"),
-    @ResourceDependency(library = "primefaces", name = "components.js"),
-    @ResourceDependency(library = "date", name = "react.production.min.js"),
-    @ResourceDependency(library = "date", name = "react-dom.production.min.js"),
-    @ResourceDependency(library = "date", name = "react-daypicker.min.js"),
-    @ResourceDependency(library = "date", name = "react-daypicker.css"),
-    @ResourceDependency(library = "date", name = "MultipleDatePicker.js") })
-public class MultiDatePicker extends UIInput
-    implements Widget, ClientBehaviorHolder {
+@ResourceDependency(library = "primefaces", name = "jquery/jquery.js")
+@ResourceDependency(library = "primefaces", name = "core.js")
+@ResourceDependency(library = "primefaces", name = "components.js")
+@ResourceDependency(library = "date", name = "react.production.min.js")
+@ResourceDependency(library = "date", name = "react-dom.production.min.js")
+@ResourceDependency(library = "date", name = "react-daypicker.min.js")
+@ResourceDependency(library = "date", name = "react-daypicker.css")
+@ResourceDependency(library = "date", name = "MultipleDatePicker.js")
+@SuppressWarnings("ucd")
+public class MultiDatePicker extends UIInput implements Widget, ClientBehaviorHolder {
+  // dont rename these constants they are used directly in javascript
   protected static enum PropertyKeys {
-    value, widgetVar, minDate, maxDate;
+    value, widgetVar, minDate, maxDate, readOnly;
   }
 
-  private static final String EVENT_CHANGE = "change";
+  private static final String EVENT_CHANGE = "change"; //$NON-NLS-1$
   private static final Collection<String> EVENT_NAMES = Collections
       .unmodifiableCollection(Arrays.asList(MultiDatePicker.EVENT_CHANGE));
-  public static final String COMPONENT_TYPE = "com.canopyasp.canopynet.os.taglib2.MultiDatePicker"; //$NON-NLS-1$
-  public static final String COMPONENT_FAMILY = "com.canopyasp.canopynet.os.taglib2.components"; //$NON-NLS-1$
+  static final String COMPONENT_TYPE = "com.canopyasp.canopynet.os.taglib2.MultiDatePicker"; //$NON-NLS-1$
+  static final String COMPONENT_FAMILY = "com.canopyasp.canopynet.os.taglib2.components"; //$NON-NLS-1$
 
   @Override
   public String getDefaultEventName() {
@@ -74,10 +70,13 @@ public class MultiDatePicker extends UIInput
     return (String) this.getStateHelper().eval(PropertyKeys.widgetVar, null);
   }
 
+  public Boolean isReadOnly() {
+    return (Boolean) this.getStateHelper().eval(PropertyKeys.readOnly, null);
+  }
+
   @Override
   public String resolveWidgetVar() {
-    final String userWidgetVar = (String) this.getAttributes()
-        .get(PropertyKeys.widgetVar.name());
+    final String userWidgetVar = (String) this.getAttributes().get(PropertyKeys.widgetVar.name());
     if (userWidgetVar != null) {
       return userWidgetVar;
     }
@@ -92,6 +91,10 @@ public class MultiDatePicker extends UIInput
 
   public void setMinDate(final Date minDate) {
     this.getStateHelper().put(PropertyKeys.minDate, minDate);
+  }
+
+  public void setReadOnly(final boolean readOnly) {
+    this.getStateHelper().put(PropertyKeys.readOnly, readOnly);
   }
 
   public void setWidgetVar(final String widgetVar) {
