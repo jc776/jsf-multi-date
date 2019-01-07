@@ -15,8 +15,11 @@
 </h:head>
 <h:body>
 	<h:form class="defaultFontSize" id="searchForm">
-		<j:multidate value="#{carShareDates.dates}" minDate="#{carShareDates.minDate}" maxDate="#{carShareDates.maxDate}" />
-		<p:commandButton value="Send" update="searchForm" actionListener="#{carShareDates.submit}" styleClass="ui-priority-primary" />
+		<j:multidate value="#{carShareDates.dates}" minDate="#{carShareDates.minDate}" maxDate="#{carShareDates.maxDate}">
+		  <!-- listener, too -->
+		  <p:ajax process="@this" update="searchForm"/>
+		</j:multidate>
+		<p:commandButton value="Highlight" update="searchForm" actionListener="#{carShareDates.doHighlight}" styleClass="ui-priority-primary" />
 		<p:commandButton value="Remove Some" update="searchForm" actionListener="#{carShareDates.removeSome}"  />
 		<ul>
 			<ui:repeat var="date" value="#{carShareDates.dates.toArray()}">

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.annotation.PostConstruct;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
@@ -19,18 +20,27 @@ public class CarShareDatesService implements Serializable {
   private static final Logger log = Logger
       .getLogger(CarShareDatesService.class);
   private Set<Date> dates;
-
-  public Set<Date> getDates() {
-    if (this.dates == null) {
-      this.dates = new TreeSet<>();
+  private Set<Date> selectedDates = new TreeSet<>();
+  
+  @PostConstruct
+  public void init() {
+	  this.dates = new TreeSet<>();
       final Calendar cal = Calendar.getInstance();
       for (int i = 0; i < 11; ++i) {
         cal.add(Calendar.DAY_OF_WEEK, 1);
         this.dates.add(cal.getTime());
       }
-    }
+  }
+
+  public Set<Date> getDates() {
     return this.dates;
   }
+  
+  public Set<Date> getSelectedDates() {
+	  return this.selectedDates;
+  }
+  
+
 
   public Date getMaxDate() {
     final Calendar cal = Calendar.getInstance();
@@ -68,7 +78,9 @@ public class CarShareDatesService implements Serializable {
                 .anyMatch(newDate -> DateHelper.matchDateOnly(date, newDate))));
   }
 
-  public void submit() {
-    CarShareDatesService.log.infof("submit: %s", this.dates);
+  public void doHighlight() {
+	  Set<Date> newDates = new TreeSet<>();
+	  newDates.addAll(this.dates);
+	  this.selectedDates = newDates;
   }
 }
