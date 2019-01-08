@@ -167,13 +167,16 @@ class MultiDateReadOnly extends React.PureComponent {
 			after: maxDate
 		})
 		const isDateHighlighted = isDateInArray.bind(null, highlightedDates)
+		const modifiers = {
+			highlighted: isDateHighlighted
+		}
 		return <DayPicker 
 			key="pick"
 			selectedDays={dates}
 			fromMonth={minDate}
 			toMonth={maxDate}
 			showOutsideDays
-			modifiers={isDateHighlighted}
+			modifiers={modifiers}
 			fixedWeeks
 			disabledDays={disabledDays}
 		/>
@@ -187,7 +190,7 @@ class MultiDateJSF extends React.PureComponent {
 		this.sendState = this.sendState.bind(this)
 		this.state = {
 			currentMonth: new Date(),
-			dates: this.props.cfg.value.map(epoch => new Date(epoch))
+			dates: (this.props.cfg.value || []).map(epoch => new Date(epoch))
 		}
 	}
 	
@@ -213,7 +216,7 @@ class MultiDateJSF extends React.PureComponent {
 		const jsonDates = JSON.stringify(
 			dates.map(date => date.getTime())
 		)
-		const highlightedDateValues = highlightedDates.map(epoch => new Date(epoch))
+		const highlightedDateValues = (highlightedDates || []).map(epoch => new Date(epoch))
 		return <div>
 			<MultiDate 
 				key="jsfPick"
@@ -242,8 +245,8 @@ PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 	
 	view: function() {
 		if(this.cfg.readOnly) {
-			const dates = this.cfg.value.map(epoch => new Date(epoch))
-			const highlightedDates = this.cfg.highlightedDates.map(epoch => new Date(epoch))
+			const dates = (this.cfg.value || []).map(epoch => new Date(epoch))
+			const highlightedDates = (this.cfg.highlightedDates || []).map(epoch => new Date(epoch))
 			return <MultiDateReadOnly 
 				dates={dates}
 				highlightedDates={highlightedDates}

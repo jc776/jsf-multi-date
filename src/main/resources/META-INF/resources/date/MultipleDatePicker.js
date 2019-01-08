@@ -246,13 +246,16 @@ var MultiDateReadOnly = function (_React$PureComponent2) {
 				after: maxDate
 			};
 			var isDateHighlighted = isDateInArray.bind(null, highlightedDates);
+			var modifiers = {
+				highlighted: isDateHighlighted
+			};
 			return React.createElement(DayPicker, {
 				key: "pick",
 				selectedDays: dates,
 				fromMonth: minDate,
 				toMonth: maxDate,
 				showOutsideDays: true,
-				modifiers: isDateHighlighted,
+				modifiers: modifiers,
 				fixedWeeks: true,
 				disabledDays: disabledDays
 			});
@@ -274,7 +277,7 @@ var MultiDateJSF = function (_React$PureComponent3) {
 		_this3.sendState = _this3.sendState.bind(_this3);
 		_this3.state = {
 			currentMonth: new Date(),
-			dates: _this3.props.cfg.value.map(function (epoch) {
+			dates: (_this3.props.cfg.value || []).map(function (epoch) {
 				return new Date(epoch);
 			})
 		};
@@ -314,7 +317,7 @@ var MultiDateJSF = function (_React$PureComponent3) {
 			var jsonDates = JSON.stringify(dates.map(function (date) {
 				return date.getTime();
 			}));
-			var highlightedDateValues = highlightedDates.map(function (epoch) {
+			var highlightedDateValues = (highlightedDates || []).map(function (epoch) {
 				return new Date(epoch);
 			});
 			return React.createElement(
@@ -349,10 +352,10 @@ PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 
 	view: function view() {
 		if (this.cfg.readOnly) {
-			var dates = this.cfg.value.map(function (epoch) {
+			var dates = (this.cfg.value || []).map(function (epoch) {
 				return new Date(epoch);
 			});
-			var highlightedDates = this.cfg.highlightedDates.map(function (epoch) {
+			var highlightedDates = (this.cfg.highlightedDates || []).map(function (epoch) {
 				return new Date(epoch);
 			});
 			return React.createElement(MultiDateReadOnly, {

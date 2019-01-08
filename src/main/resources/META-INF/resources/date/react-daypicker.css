@@ -211,6 +211,14 @@ outside - last/next month
 highlighted - other person's selection
 */
 
+.Daypicker-Month {
+	table-layout: fixed;
+}
+
+.DayPicker-Weekday {
+	width: 22px;
+}
+
 .DayPicker-Day {
 	position: relative;
 	border-radius: 100%;
@@ -234,11 +242,11 @@ highlighted - other person's selection
   background-color: #f0f8ff;
 }
 
-.DayPicker-Day--selected:not(.DayPicker-Day--disabled):hover {
+.DayPicker:not(.DayPicker--interactionDisabled) .DayPicker-Day--selected:not(.DayPicker-Day--disabled):hover {
   background-color: #51a0fa;
 }
 
-.DayPicker-Day:not(.DayPicker-Day--selected):not(.DayPicker-Day--disabled):hover {
+.DayPicker:not(.DayPicker--interactionDisabled) .DayPicker-Day:not(.DayPicker-Day--selected):not(.DayPicker-Day--disabled):hover {
   background-color: #f0f8ff;
 }
 
@@ -260,12 +268,12 @@ highlighted - other person's selection
   background-color: #00aa00;
 }
 
-.DayPicker-Day--highlighted.DayPicker-Day--selected:not(.DayPicker-Day--disabled):hover {
-  background-color: #00ff00;
+.DayPicker:not(.DayPicker--interactionDisabled) .DayPicker-Day--highlighted.DayPicker-Day--selected:not(.DayPicker-Day--disabled):hover {
+ background-color: #00e100;
 }
 
-.DayPicker-Day--highlighted.DayPicker-Day:not(.DayPicker-Day--selected):not(.DayPicker-Day--disabled):hover {
-  background-color: #00cc00;
+.DayPicker:not(.DayPicker--interactionDisabled) .DayPicker-Day--highlighted.DayPicker-Day:not(.DayPicker-Day--selected):not(.DayPicker-Day--disabled):hover {
+  background-color: #ffbbbb;
 }
 
 

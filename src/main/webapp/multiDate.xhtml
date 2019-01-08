@@ -17,10 +17,11 @@
 	<h:form class="defaultFontSize" id="searchForm">
 		<j:multidate id="datesField" highlightedDates="#{carShareDates.selectedDates}" value="#{carShareDates.dates}" minDate="#{carShareDates.minDate}" maxDate="#{carShareDates.maxDate}">
 		  <!-- listener, too -->
-		  <p:ajax process="@this" update="datesField, datesList"/>
+		  <p:ajax process="@this" update="highlightedDates, datesList"/>
 		</j:multidate>
-		<p:commandButton value="Highlight" update="datesField, datesList" actionListener="#{carShareDates.doHighlight}" styleClass="ui-priority-primary" />
-		<p:commandButton value="Remove Some" update="datesField, datesList" actionListener="#{carShareDates.removeSome}"  />
+		<j:multidate readOnly="true" id="highlightedDates" highlightedDates="#{carShareDates.selectedDates}" value="#{carShareDates.dates}" minDate="#{carShareDates.minDate}" maxDate="#{carShareDates.maxDate}"/>
+		<p:commandButton value="Highlight" update="datesField, highlightedDates, datesList" actionListener="#{carShareDates.doHighlight}" styleClass="ui-priority-primary" />
+		<p:commandButton value="Remove Some" update="datesField, highlightedDates, datesList" actionListener="#{carShareDates.removeSome}"  />
 		<p:outputPanel id="datesList">
 		<ul>
 			<ui:repeat var="date" value="#{carShareDates.dates.toArray()}">
