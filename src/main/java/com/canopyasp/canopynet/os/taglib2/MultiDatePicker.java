@@ -28,7 +28,7 @@ import org.primefaces.component.api.Widget;
 public class MultiDatePicker extends UIInput implements Widget, ClientBehaviorHolder {
   // dont rename these constants they are used directly in javascript
   protected static enum PropertyKeys {
-    value, widgetVar, minDate, maxDate, readOnly;
+    value, widgetVar, minDate, maxDate, readOnly, highlightedDates;
   }
 
   private static final String EVENT_CHANGE = "change"; //$NON-NLS-1$
@@ -55,6 +55,11 @@ public class MultiDatePicker extends UIInput implements Widget, ClientBehaviorHo
   public Date getMaxDate() {
     return (Date) this.getStateHelper().eval(PropertyKeys.maxDate, null);
   }
+  
+  @SuppressWarnings("unchecked")
+  public Set<Date> getHighlightedDates() {
+	    return (Set<Date>) this.getStateHelper().eval(PropertyKeys.highlightedDates, null);
+	  }
 
   public Date getMinDate() {
     return (Date) this.getStateHelper().eval(PropertyKeys.minDate, null);
@@ -88,6 +93,10 @@ public class MultiDatePicker extends UIInput implements Widget, ClientBehaviorHo
   public void setMaxDate(final Date maxDate) {
     this.getStateHelper().put(PropertyKeys.maxDate, maxDate);
   }
+  
+  public void setHighlightedDates(final Set<Date> dates) {
+	    this.getStateHelper().put(PropertyKeys.highlightedDates, dates);
+	  }
 
   public void setMinDate(final Date minDate) {
     this.getStateHelper().put(PropertyKeys.minDate, minDate);

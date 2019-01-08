@@ -56,6 +56,12 @@ function mkWeeknumberClick(props) {
 	};
 }
 
+function isDateInArray(dates, dateToFind) {
+	return dates.some(function (date) {
+		return DayPicker.DateUtils.isSameDay(date, dateToFind);
+	});
+}
+
 function getToggleDates(dates, inputDates, props) {
 	var range = {
 		from: props.minDate,
@@ -65,21 +71,15 @@ function getToggleDates(dates, inputDates, props) {
 		return DayPicker.DateUtils.isDayInRange(inputDate, range);
 	});
 
-	// valid dates only, too - min, max date and any other restrictions
+	// valid dates only? - min, max date and any other restrictions
 	var missingDates = toggleDates.filter(function (toggleDate) {
-		return !dates.some(function (date) {
-			return DayPicker.DateUtils.isSameDay(date, toggleDate);
-		});
+		return !isDateInArray(dates, toggleDate);
 	});
 	var presentDates = toggleDates.filter(function (toggleDate) {
-		return dates.some(function (date) {
-			return DayPicker.DateUtils.isSameDay(date, toggleDate);
-		});
+		return isDateInArray(dates, toggleDate);
 	});
 	var removedDates = dates.filter(function (date) {
-		return !toggleDates.some(function (toggleDate) {
-			return DayPicker.DateUtils.isSameDay(date, toggleDate);
-		});
+		return !isDateInArray(toggleDates, date);
 	});
 
 	return { toggleDates: toggleDates, missingDates: missingDates, presentDates: presentDates, removedDates: removedDates };
@@ -179,6 +179,7 @@ var MultiDate = function (_React$PureComponent) {
 		key: "render",
 		value: function render() {
 			var _props = this.props,
+			    highlightedDates = _props.highlightedDates,
 			    currentMonth = _props.currentMonth,
 			    minDate = _props.minDate,
 			    maxDate = _props.maxDate;
@@ -191,9 +192,14 @@ var MultiDate = function (_React$PureComponent) {
 				before: minDate,
 				after: maxDate
 			};
+			var isDateHighlighted = isDateInArray.bind(null, highlightedDates);
+			var modifiers = {
+				highlighted: isDateHighlighted
+			};
 			return React.createElement(DayPicker, {
 				key: "pick",
 				selectedDays: selectedDays,
+				modifiers: modifiers,
 				onDayClick: this.handleDayClick,
 				onWeekClick: this.handleRowClick,
 				onMonthChange: this.handleMonthChange,
@@ -230,6 +236,7 @@ var MultiDateReadOnly = function (_React$PureComponent2) {
 			console.log(this.props);
 			var _props2 = this.props,
 			    dates = _props2.dates,
+			    highlightedDates = _props2.highlightedDates,
 			    minDate = _props2.minDate,
 			    maxDate = _props2.maxDate,
 			    debug = _props2.debug;
@@ -238,12 +245,14 @@ var MultiDateReadOnly = function (_React$PureComponent2) {
 				before: minDate,
 				after: maxDate
 			};
+			var isDateHighlighted = isDateInArray.bind(null, highlightedDates);
 			return React.createElement(DayPicker, {
 				key: "pick",
 				selectedDays: dates,
 				fromMonth: minDate,
 				toMonth: maxDate,
 				showOutsideDays: true,
+				modifiers: isDateHighlighted,
 				fixedWeeks: true,
 				disabledDays: disabledDays
 			});
@@ -297,6 +306,7 @@ var MultiDateJSF = function (_React$PureComponent3) {
 			    currentMonth = _state.currentMonth,
 			    dates = _state.dates;
 			var _props$cfg = this.props.cfg,
+			    highlightedDates = _props$cfg.highlightedDates,
 			    minDate = _props$cfg.minDate,
 			    maxDate = _props$cfg.maxDate,
 			    id = _props$cfg.id;
@@ -304,6 +314,9 @@ var MultiDateJSF = function (_React$PureComponent3) {
 			var jsonDates = JSON.stringify(dates.map(function (date) {
 				return date.getTime();
 			}));
+			var highlightedDateValues = highlightedDates.map(function (epoch) {
+				return new Date(epoch);
+			});
 			return React.createElement(
 				"div",
 				null,
@@ -312,6 +325,7 @@ var MultiDateJSF = function (_React$PureComponent3) {
 					onChange: this.handleChange,
 					dates: dates,
 					currentMonth: currentMonth,
+					highlightedDates: highlightedDateValues,
 					minDate: new Date(minDate),
 					maxDate: new Date(maxDate),
 					debug: false
@@ -327,7 +341,9 @@ var MultiDateJSF = function (_React$PureComponent3) {
 PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 	init: function init(cfg) {
 		this._super(cfg);
+		console.log("MultiDate - INIT");
 		console.log(this.cfg);
+		console.log(this.jq[0]);
 		this.render();
 	},
 
@@ -336,8 +352,12 @@ PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 			var dates = this.cfg.value.map(function (epoch) {
 				return new Date(epoch);
 			});
+			var highlightedDates = this.cfg.highlightedDates.map(function (epoch) {
+				return new Date(epoch);
+			});
 			return React.createElement(MultiDateReadOnly, {
 				dates: dates,
+				highlightedDates: highlightedDates,
 				minDate: new Date(this.cfg.minDate),
 				maxDate: new Date(this.cfg.maxDate),
 				debug: false

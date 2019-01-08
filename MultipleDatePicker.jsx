@@ -23,6 +23,10 @@ function mkWeeknumberClick(props) {
 	}
 }
 
+function isDateInArray(dates, dateToFind) {
+	return dates.some(date => DayPicker.DateUtils.isSameDay(date, dateToFind))
+}
+
 function getToggleDates(dates, inputDates, props) {
 	const range = {
 		from: props.minDate,
@@ -32,15 +36,15 @@ function getToggleDates(dates, inputDates, props) {
 		DayPicker.DateUtils.isDayInRange(inputDate, range)
 	)
 
-	// valid dates only, too - min, max date and any other restrictions
+	// valid dates only? - min, max date and any other restrictions
 	const missingDates = toggleDates.filter(toggleDate =>
-		!dates.some(date => DayPicker.DateUtils.isSameDay(date, toggleDate))
+		!isDateInArray(dates, toggleDate)
 	)
 	const presentDates = toggleDates.filter(toggleDate =>
-		dates.some(date => DayPicker.DateUtils.isSameDay(date, toggleDate))
+		isDateInArray(dates, toggleDate)
 	)
-	const removedDates = dates.filter(date => 
-		!toggleDates.some(toggleDate => DayPicker.DateUtils.isSameDay(date, toggleDate))
+	const removedDates = dates.filter(date =>
+		!isDateInArray(toggleDates, date) 
 	)
 	
 	return { toggleDates, missingDates, presentDates, removedDates }
@@ -119,7 +123,7 @@ class MultiDate extends React.PureComponent {
 	}
 
 	render() {
-		const { currentMonth, minDate, maxDate } = this.props
+		const { highlightedDates, currentMonth, minDate, maxDate } = this.props
 		const selectedDays = this.props.dates
 		console.log("currentMonth: ", currentMonth)
 		const weekdayElement = <WeekdayClick props={this.props} onClick={this.handleColumnClick} />
@@ -128,9 +132,14 @@ class MultiDate extends React.PureComponent {
 			before: minDate,
 			after: maxDate
 		})
+		const isDateHighlighted = isDateInArray.bind(null, highlightedDates)
+		const modifiers = {
+			highlighted: isDateHighlighted
+		}
 		return <DayPicker 
 			key="pick"
 			selectedDays={selectedDays}
+			modifiers={modifiers}
 			onDayClick={this.handleDayClick}
 			onWeekClick={this.handleRowClick}
 			onMonthChange={this.handleMonthChange}
@@ -152,17 +161,19 @@ class MultiDate extends React.PureComponent {
 class MultiDateReadOnly extends React.PureComponent {
 	render() {
 		console.log(this.props)
-		const { dates, minDate, maxDate, debug } = this.props
+		const { dates, highlightedDates, minDate, maxDate, debug } = this.props
 		const disabledDays = (!debug && {
 			before: minDate,
 			after: maxDate
 		})
+		const isDateHighlighted = isDateInArray.bind(null, highlightedDates)
 		return <DayPicker 
 			key="pick"
 			selectedDays={dates}
 			fromMonth={minDate}
 			toMonth={maxDate}
 			showOutsideDays
+			modifiers={isDateHighlighted}
 			fixedWeeks
 			disabledDays={disabledDays}
 		/>
@@ -198,16 +209,18 @@ class MultiDateJSF extends React.PureComponent {
 	
 	render() {
 		const { currentMonth, dates } = this.state 
-		const { minDate, maxDate, id } = this.props.cfg
+		const { highlightedDates, minDate, maxDate, id } = this.props.cfg
 		const jsonDates = JSON.stringify(
 			dates.map(date => date.getTime())
 		)
+		const highlightedDateValues = highlightedDates.map(epoch => new Date(epoch))
 		return <div>
 			<MultiDate 
 				key="jsfPick"
 				onChange={this.handleChange}
 				dates={dates}
 				currentMonth={currentMonth}
+				highlightedDates={highlightedDateValues}
 				minDate={new Date(minDate)} 
 				maxDate={new Date(maxDate)}
 				debug={false} 
@@ -221,15 +234,19 @@ class MultiDateJSF extends React.PureComponent {
 PrimeFaces.widget.MultiDatePicker = PrimeFaces.widget.BaseWidget.extend({
 	init: function(cfg) {
 		this._super(cfg)
+		console.log("MultiDate - INIT")
 		console.log(this.cfg)
+		console.log(this.jq[0])
 		this.render()
 	},
 	
 	view: function() {
 		if(this.cfg.readOnly) {
 			const dates = this.cfg.value.map(epoch => new Date(epoch))
+			const highlightedDates = this.cfg.highlightedDates.map(epoch => new Date(epoch))
 			return <MultiDateReadOnly 
 				dates={dates}
+				highlightedDates={highlightedDates}
 				minDate={new Date(this.cfg.minDate)} 
 				maxDate={new Date(this.cfg.maxDate)}
 				debug={false}
